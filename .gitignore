@@ -2,6 +2,6 @@
 __pycache__/
 .DS_Store
 .venv/
-src/knowledge/docs/
-src/knowledge/vector_store/
+src/knowledge/docs/*
+src/knowledge/vector_store/*
 src/knowledge/short_term.sqlite
