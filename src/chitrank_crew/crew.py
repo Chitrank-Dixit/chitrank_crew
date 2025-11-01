@@ -15,24 +15,6 @@ ollama_llm = LLM(
     base_url=base_url
 )
 
-# RAG Ingest Directory
-ingest_tool = RAGIngestTool()
-ingest_result = ingest_tool.run({
-  "directory": "/Users/chitrankdixit/Documents/personal_projects/prabhu-ai/chitrank_crew/src/knowledge/docs/shared",
-  "agent_scope": "shared",
-  "namespace": "auth-feature",
-  "patterns": "*.pdf,*.txt",
-  "max_words": 300,
-  "overlap_words": 50
-})
-
-query_tool = RAGQueryTool()
-query_result = query_tool.run({
-  "query": "password reset token expiry and security considerations",
-  "top_k": 8,
-  "agent_scope": "shared",
-  "namespace": "auth-feature"
-})
 
 # RAG Ingest Directory for software_engineer
 
@@ -49,10 +31,10 @@ class ChitrankCrew():
 
     @agent
     def manager(self) -> Agent:
-        
+        # Note: verbose=True adds logging overhead. Set to False for faster execution.
         return Agent(
             config=self.agents_config['manager'],  # type: ignore[index]
-            verbose=True,
+            verbose=False,
             llm=ollama_llm,
             tools=[VectorRememberTool(), VectorRecallTool(), STStoreTool(), STFetchTool(), RAGIngestTool(), RAGQueryTool(),
             AgentScopedRAGIngestTool(default_agent_scope="manager"),
@@ -64,7 +46,7 @@ class ChitrankCrew():
         
         return Agent(
             config=self.agents_config['software_engineer'],  # type: ignore[index]
-            verbose=True,
+            verbose=False,
             llm=ollama_llm,
             tools=[VectorRememberTool(), VectorRecallTool(), STStoreTool(), STFetchTool(), RAGIngestTool(), RAGQueryTool(),
             AgentScopedRAGIngestTool(default_agent_scope="software_engineer"),
@@ -76,7 +58,7 @@ class ChitrankCrew():
         
         return Agent(
             config=self.agents_config['devops_engineer'],  # type: ignore[index]
-            verbose=True,
+            verbose=False,
             llm=ollama_llm,
             tools=[VectorRememberTool(), VectorRecallTool(), STStoreTool(), STFetchTool(), RAGIngestTool(), RAGQueryTool(),
             AgentScopedRAGIngestTool(default_agent_scope="devops_engineer"),
@@ -88,7 +70,7 @@ class ChitrankCrew():
         
         return Agent(
             config=self.agents_config['qa_engineer'],  # type: ignore[index]
-            verbose=True,
+            verbose=False,
             llm=ollama_llm,
             tools=[VectorRememberTool(), VectorRecallTool(), STStoreTool(), STFetchTool(), RAGIngestTool(), RAGQueryTool(),
             AgentScopedRAGIngestTool(default_agent_scope="qa_engineer"),
@@ -138,6 +120,7 @@ class ChitrankCrew():
     def crew(self) -> Crew:
         """Creates the ChitrankCrew crew"""
         #self._debug_print_configs()
+        # Note: verbose=True adds logging overhead. Set to False for faster execution.
         return Crew(
             agents=self.agents,
             tasks=self.tasks,

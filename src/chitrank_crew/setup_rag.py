@@ -8,6 +8,17 @@ Run this separately when documents are added or updated.
 from chitrank_crew.tools.custom_tool import AgentScopedRAGIngestTool, AgentScopedRAGQueryTool, RAGIngestTool, RAGQueryTool
 import json
 
+def prewarm_embedding_model():
+    """Pre-warm the embedding model to avoid delay on first crew run"""
+    print("🔥 Pre-warming embedding model (this may take 30-60 seconds on first run)...")
+    try:
+        from chitrank_crew.tools.custom_tool import _ensure_vector_store
+        _ensure_vector_store()
+        print("   ✓ Embedding model loaded and ready!")
+    except Exception as e:
+        print(f"   ⚠️  Warning: Could not pre-warm model: {e}")
+        print("   (This is okay, it will load on first use)")
+
 def ingest_shared():
     """Ingest shared documents into RAG vector store"""
     print("📚 Ingesting shared documents...")
@@ -124,12 +135,18 @@ def initialize_rag():
     """Initialize RAG by ingesting all agent documents"""
     print("🚀 Starting RAG initialization...\n")
     try:
+        # Pre-warm embedding model first (downloads/loads on first run)
+        prewarm_embedding_model()
+        print()  # Empty line for readability
+        
+        # Then ingest documents
         ingest_shared()
         ingest_se()
         ingest_qa()
         ingest_devops()
         ingest_manager()
         print("\n✅ RAG initialization complete!")
+        print("💡 Tip: The embedding model is now cached, future crew runs will be faster!")
     except Exception as e:
         print(f"\n❌ Error during RAG initialization: {e}")
         raise

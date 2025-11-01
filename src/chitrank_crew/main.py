@@ -15,6 +15,14 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 # Replace with inputs you want to test with, it will automatically
 # interpolate any tasks and agents information
 
+def prewarm_tools():
+    """Pre-warm tools to load embedding model before crew execution"""
+    try:
+        from chitrank_crew.tools.custom_tool import _ensure_vector_store
+        _ensure_vector_store()
+        print("✓ Tools pre-warmed (embedding model loaded)")
+    except Exception as e:
+        print(f"⚠️  Could not pre-warm tools: {e}")
 
 def new_session_id() -> str:
     return uuid.uuid4().hex
@@ -23,6 +31,9 @@ def run():
     """
     Run the crew.
     """
+    # Pre-warm tools to avoid delay on first tool use
+    prewarm_tools()
+    
     inputs = {
         "session": new_session_id(),
         "project_name": "AwesomeApp",

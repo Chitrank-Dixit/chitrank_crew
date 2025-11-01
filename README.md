@@ -49,6 +49,10 @@ Before running the crew, you need to ingest documents into the vector store. Run
 uv run setup_rag
 ```
 
+**⏱️ First Run Timing:**
+- **First time**: ~1-2 minutes (downloads ~90MB embedding model, loads into memory, then ingests documents)
+- **Subsequent runs**: ~10-30 seconds (only ingests documents, model is cached)
+
 This will ingest documents from:
 - `src/knowledge/docs/shared/` - Shared documents for all agents
 - `src/knowledge/docs/software_engineer/` - Software engineer specific docs
@@ -168,3 +172,49 @@ This project includes a sophisticated memory system:
 - **RAG (Retrieval Augmented Generation)**: Document-based knowledge retrieval with agent scoping
 
 Documents are organized by agent scope, allowing each agent to access relevant knowledge while maintaining separation of concerns.
+
+## Performance Notes
+
+### First Run (Cold Start)
+
+The **first time** you run the crew with RAG/memory tools, expect delays:
+
+1. **Embedding Model Download**: ~30-60 seconds
+   - Downloads `sentence-transformers/all-MiniLM-L6-v2` (~90MB)
+   - Stored in `~/.cache/huggingface/` (cached for future runs)
+
+2. **Model Loading**: ~5-10 seconds
+   - Loads the model into memory
+   - Subsequent runs: ~1-2 seconds (model cached)
+
+3. **Database Initialization**: ~1-2 seconds
+   - Creates ChromaDB and SQLite databases/tables
+
+**Total first run**: ~1-2 minutes before agent execution starts
+
+### Subsequent Runs
+
+After the first run:
+- **Model loading**: ~1-2 seconds (cached)
+- **Database access**: Instant (already created)
+- **Crew execution**: Depends on your LLM and task complexity
+
+### Optimization Tips for Crew Execution
+
+1. **Pre-warm embedding model**: The `run_crew` command now automatically pre-warms the embedding model to avoid delays on first tool use
+2. **Run `setup_rag` first**: Ensures documents are ingested and model is cached
+3. **LLM Performance**: Crew execution speed depends heavily on your LLM:
+   - **Local Ollama**: Faster models (e.g., `llama3.2`, `mistral`) will execute faster than larger models
+   - **Remote API**: Network latency adds overhead; consider using faster/cheaper models for development
+4. **Reduce verbose mode**: Set `verbose=False` in `crew.py` for faster execution (currently `verbose=True` for debugging)
+5. **Tool count**: Each agent has 8 tools - more tools mean more decision overhead for the LLM. Consider removing unused tools if speed is critical
+6. **Keep MCP server running**: If using MCP, keep it running to reuse the loaded embedding model across sessions
+7. **Task dependencies**: Sequential processing is necessary but slow - tasks run one after another based on dependencies
+
+### Expected Crew Execution Times
+
+- **With fast local LLM (Ollama)**: 2-5 minutes for a full crew run
+- **With remote API (OpenAI/Anthropic)**: 3-10 minutes (depends on network and model speed)
+- **Agent thinking + tool calls**: Each agent decision can take 5-30 seconds depending on LLM speed
+
+The main bottleneck is typically **LLM inference time**, not the tools themselves.

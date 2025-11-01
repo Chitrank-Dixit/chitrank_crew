@@ -86,7 +86,13 @@ def vector_recall(agent: str, query: str, top_k: int = 5) -> str:
     dists = (res.get("distances") or [[]])[0]
     out = []
     for d, m, s in zip(docs, metas, dists):
-        out.append({"text": d, "agent": m.get("agent"), "tags": m.get("tags", []), "score": float(s)})
+        # Parse tags from JSON string (ChromaDB doesn't support lists in metadata)
+        tags_str = m.get("tags", "[]")
+        try:
+            tags_list = json.loads(tags_str) if isinstance(tags_str, str) else (tags_str or [])
+        except (json.JSONDecodeError, TypeError):
+            tags_list = []
+        out.append({"text": d, "agent": m.get("agent"), "tags": tags_list, "score": float(s)})
     return json.dumps(out)
 
 @app.tool()

@@ -48,7 +48,9 @@ class VectorRememberTool(BaseTool):
     def _run(self, agent: str, text: str, tags: List[str] = None) -> str:
         col, emb = _ensure_vector_store()
         doc_id = f"{agent}:{int(time.time()*1000)}"
-        meta = {"agent": agent, "tags": tags or []}
+        # ChromaDB metadata doesn't accept lists, so convert tags to JSON string
+        tags_list = tags or []
+        meta = {"agent": agent, "tags": json.dumps(tags_list)}
         vec = emb.encode([text]).tolist()[0]
         col.add(ids=[doc_id], documents=[text], metadatas=[meta], embeddings=[vec])
         return "saved"
@@ -67,7 +69,13 @@ class VectorRecallTool(BaseTool):
         scores = (res.get("distances") or [[]])[0]  # lower is better in Chroma 0.5 by default
         out = []
         for d, m, s in zip(docs, metas, scores):
-            out.append({"text": d, "agent": m.get("agent"), "tags": m.get("tags", []), "score": float(s)})
+            # Parse tags from JSON string (ChromaDB doesn't support lists in metadata)
+            tags_str = m.get("tags", "[]")
+            try:
+                tags_list = json.loads(tags_str) if isinstance(tags_str, str) else (tags_str or [])
+            except (json.JSONDecodeError, TypeError):
+                tags_list = []
+            out.append({"text": d, "agent": m.get("agent"), "tags": tags_list, "score": float(s)})
         return json.dumps(out)
 
 # ---------- Short-term Memory (SQLite) ----------
