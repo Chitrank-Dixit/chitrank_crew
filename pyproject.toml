@@ -1,0 +1,31 @@
+[project]
+name = "chitrank_crew"
+version = "0.1.0"
+description = "chitrank-crew using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]==1.2.1",
+    "litellm>=1.79.0",
+    "chromadb>=0.5.5",
+    "sentence-transformers>=3.2.1",
+    "pypdf>=5.0.0",
+    "mcp>=1.19.0",
+]
+
+[project.scripts]
+chitrank_crew = "chitrank_crew.main:run"
+run_crew = "chitrank_crew.main:run"
+setup_rag = "chitrank_crew.setup_rag:initialize_rag"
+mcp_server = "mcp_servers.crew_memory_server:run"
+train = "chitrank_crew.main:train"
+replay = "chitrank_crew.main:replay"
+test = "chitrank_crew.main:test"
+run_with_trigger = "chitrank_crew.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

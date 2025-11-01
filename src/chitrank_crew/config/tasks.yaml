@@ -1,0 +1,56 @@
+plan_project:
+  description: >
+    Create a concise plan for delivering the feature "{feature_spec}" in project "{project_name}".
+    Break down milestones for design, implementation, DevOps work, and testing. Identify risks and mitigations.
+    Ground your answer using rag_query; prefer top 5 results. Cite path fields.
+  expected_output: >
+    A short project plan with milestones, dependencies, owners (SE/DevOps/QA), and timeline estimates.
+    Use markdown lists and headings. Include a simple RACI table if relevant.
+  agent: manager
+
+implement_feature:
+  description: >
+    Design and implement the feature "{feature_spec}" for project "{project_name}".
+    Provide architecture notes, key interfaces, data models, and pseudocode or step-by-step implementation outline.
+    Ground your answer using rag_query; prefer top 5 results. Cite path fields.
+  expected_output: >
+    A technical design and an implementation outline (pseudocode or structured steps),
+    including data structures, APIs, and non-functional considerations.
+  agent: software_engineer
+
+setup_ci_cd:
+  description: >
+    Define or update CI/CD for repository "{repo_url}" and service "{service_name}" to build, test, and deploy the feature.
+    Specify pipeline stages, triggers, caching, test execution, and deployment strategy for environment "{environment}".
+    Ground your answer using rag_query; prefer top 5 results. Cite path fields.
+  expected_output: >
+    A CI/CD plan including pipeline YAML example, environment variables/secrets list, artifact strategy,
+    and rollback/observability notes.
+  agent: devops_engineer
+
+write_tests:
+  description: >
+    Produce a test strategy and detailed test cases for the feature "{feature_spec}".
+    Cover unit, integration, and end-to-end tests, including edge cases and negative scenarios.
+    Ground your answer using rag_query; prefer top 5 results. Cite path fields.
+  expected_output: >
+    A test plan with traceability to requirements, prioritized test cases, and sample test code skeletons where useful.
+  agent: qa_engineer
+
+final_review:
+  description: >
+    Review outputs from engineering, DevOps, and QA. Consolidate into a final delivery note and next steps.
+    Ensure alignment with the initial plan and call out any remaining risks.
+    Ground your answer using rag_query; prefer top 5 results. Cite path fields.
+  expected_output: >
+    A final summary including what was implemented, how it will be deployed and tested, acceptance criteria,
+    and clear next steps or follow-ups.
+  agent: manager
+
+ingest_docs:
+  description: >
+    Ingest reference PDFs/TXT from {docs_dir} into the RAG store under namespace {rag_namespace} and scope {rag_agent_scope}.
+    Use rag_ingest with patterns "*.pdf,*.txt". Confirm chunks added.
+  expected_output: >
+    A short confirmation with files ingested and chunks count, or a note if nothing changed.
+  agent: manager

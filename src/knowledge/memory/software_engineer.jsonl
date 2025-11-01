@@ -1,0 +1,7 @@
+{"text": "User can reset password via email magic link with token expiry, project: AwesomeApp, task: Design and implement password reset feature", "tags": []}
+{"text": "API Endpoints: GET /password-reset, POST /password-reset, PUT /password-reset/token; Data Models: PasswordResetRequest, PasswordResetResponse, Token", "tags": []}
+{"text": "Implement password reset logic using API Endpoints: GET /password-reset, POST /password-reset, PUT /password-reset/token; Data Models: PasswordResetRequest, PasswordResetResponse, Token", "tags": []}
+{"text": "Implement API Endpoints: GET /password-reset, POST /password-reset, PUT /password-reset/token; Use Data Models: PasswordResetRequest, PasswordResetResponse, Token", "tags": []}
+{"text": "Test Strategy for Password Reset Feature", "tags": ["password reset", "test strategy"]}
+{"text": "Unit Test Case 1: Verify password reset logic when token expiry is set to a short period of time (e.g., 30 minutes)", "tags": ["unit test", "password reset"]}
+{"text": "Create unit test cases for password reset logic, covering edge cases and negative scenarios", "tags": ["unit tests", "password reset"]}
